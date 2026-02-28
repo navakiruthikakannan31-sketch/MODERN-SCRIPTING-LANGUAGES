@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html ng-app="calcApp">
+<head>
+    <title>AngularJS Arithmetic Calculator</title>
+
+    <!-- AngularJS CDN -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+    <style>
+        body{
+            font-family: Arial;
+            background: linear-gradient(135deg,#4facfe,#00f2fe);
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+
+        .container{
+            background:white;
+            padding:30px;
+            border-radius:12px;
+            box-shadow:0px 0px 15px rgba(0,0,0,0.2);
+            width:320px;
+            text-align:center;
+        }
+
+        input{
+            width:90%;
+            padding:10px;
+            margin:10px 0;
+            font-size:16px;
+        }
+
+        button{
+            padding:10px 15px;
+            margin:5px;
+            border:none;
+            border-radius:6px;
+            cursor:pointer;
+            background:#4facfe;
+            color:white;
+            font-size:15px;
+            transition:0.3s;
+        }
+
+        button:hover{
+            background:#007bff;
+            transform:scale(1.05);
+        }
+
+        h2{
+            color:#007bff;
+        }
+
+        .result{
+            margin-top:15px;
+            font-size:20px;
+            font-weight:bold;
+            color:#333;
+        }
+    </style>
+</head>
+
+<body ng-controller="CalcController">
+
+<div class="container">
+    <h2>Arithmetic Calculator</h2>
+
+    <input type="number" ng-model="num1" placeholder="Enter First Number">
+    <input type="number" ng-model="num2" placeholder="Enter Second Number">
+
+    <div>
+        <button ng-click="calculate('+')">+</button>
+        <button ng-click="calculate('-')">-</button>
+        <button ng-click="calculate('*')">*</button>
+        <button ng-click="calculate('/')">/</button>
+    </div>
+
+    <div class="result">
+        Result : {{result}}
+    </div>
+</div>
+
+<script src="ARITHEMTIC.js"></script>
+
+</body>
+</html>
