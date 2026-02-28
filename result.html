@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Logical Operators - Switch Case</title>
+
+<style>
+    body{
+        margin:0;
+        height:100vh;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        background:#1f2933; /* calm dark gray */
+        font-family:Arial, Helvetica, sans-serif;
+    }
+
+    .container{
+        background:#2d3748;
+        padding:40px;
+        border-radius:12px;
+        box-shadow:0 10px 25px rgba(0,0,0,0.4);
+        text-align:center;
+        width:350px;
+        color:#e2e8f0;
+    }
+
+    h2{
+        margin-bottom:20px;
+        font-weight:500;
+    }
+
+    select,input,button{
+        margin:10px;
+        padding:10px;
+        border:none;
+        border-radius:6px;
+        font-size:16px;
+        outline:none;
+    }
+
+    input{
+        width:120px;
+        background:#edf2f7;
+    }
+
+    select{
+        background:#edf2f7;
+    }
+
+    button{
+        background:#4a90e2;
+        color:white;
+        cursor:pointer;
+        transition:0.3s;
+    }
+
+    button:hover{
+        background:#357abd;
+    }
+
+    #result{
+        margin-top:15px;
+        font-size:18px;
+        font-weight:bold;
+        color:#90cdf4;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Logical Operators</h2>
+
+    <input type="number" id="a" placeholder="Value A (0/1)">
+    <input type="number" id="b" placeholder="Value B (0/1)">
+    <br>
+
+    <select id="operator">
+        <option value="AND">AND (&&)</option>
+        <option value="OR">OR (||)</option>
+        <option value="NOT">NOT (!A)</option>
+    </select>
+    <br>
+
+    <button onclick="calculate()">Check Result</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+
+function calculate(){
+
+    let a = Number(document.getElementById("a").value);
+    let b = Number(document.getElementById("b").value);
+    let op = document.getElementById("operator").value;
+
+    let result;
+
+    switch(op){
+
+        // AND Operator
+        case "AND":
+            // own implementation
+            if(a === 1 && b === 1)
+                result = 1;
+            else
+                result = 0;
+            break;
+
+        // OR Operator
+        case "OR":
+            // own implementation
+            if(a === 1 || b === 1)
+                result = 1;
+            else
+                result = 0;
+            break;
+
+        // NOT Operator
+        case "NOT":
+            // own implementation
+            result = (a === 1) ? 0 : 1;
+            break;
+
+        default:
+            result = "Invalid";
+    }
+
+    document.getElementById("result").innerHTML =
+        "Result : " + result;
+}
+
+</script>
+
+</body>
+</html>
