@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html ng-app="inventoryApp">
+<head>
+    <title>Mepco Stock Manager</title>
+    <script src="angular.min.js"></script>
+    <style>
+        :root { --accent: #6366f1; --dark: #0f172a; }
+        body { background-color: var(--dark); font-family: 'Inter', sans-serif; color: #f1f5f9; margin: 0; padding: 50px; }
+        .container { max-width: 900px; margin: auto; }
+        
+        .main-card { background: #1e293b; padding: 30px; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); }
+        .form-box { background: #334155; padding: 20px; border-radius: 12px; display: flex; gap: 10px; margin-bottom: 25px; }
+        input { flex: 1; padding: 12px; border-radius: 6px; border: none; background: #0f172a; color: white; outline: 1px solid #475569; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #1e293b; }
+        th { text-align: left; color: #94a3b8; font-size: 12px; text-transform: uppercase; padding: 15px; border-bottom: 2px solid #334155; }
+        td { padding: 15px; border-bottom: 1px solid #334155; }
+        
+        .status-tag { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .low { background: #fee2e2; color: #991b1b; }
+        .ok { background: #dcfce7; color: #166534; }
+        .btn-add { background: var(--accent); color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        [ng-cloak] { display: none !important; }
+    </style>
+</head>
+<body ng-controller="StockCtrl as stock" ng-cloak>
+
+<div class="container">
+    <div class="main-card">
+        <h1 style="color: var(--accent); margin-top:0;">📦 Warehouse Inventory</h1>
+
+        <!-- Form for Data Entry -->
+        <div class="form-box">
+            <input type="text" ng-model="stock.newItem.sku" placeholder="SKU Code">
+            <input type="text" ng-model="stock.newItem.name" placeholder="Product Name">
+            <input type="number" ng-model="stock.newItem.qty" placeholder="Quantity">
+            <button class="btn-add" ng-click="stock.addItem()">Register Stock</button>
+        </div>
+
+        <!-- CUSTOM COMPONENT: Inventory Table -->
+        <inventory-table data="stock.products"></inventory-table>
+        
+    </div>
+</div>
+
+<script>
+    var app = angular.module('inventoryApp', []);
+
+    // 1. CUSTOM FILTER: Alerts if quantity is below 5
+    app.filter('stockStatus', function() {
+        return function(qty) {
+            if (qty === undefined) return "";
+            return (qty < 5) ? "LOW STOCK ALERT" : "IN STOCK";
+        };
+    });
+
+    // 2. CUSTOM COMPONENT: Manages the display table
+    app.component('inventoryTable', {
+        bindings: { data: '<' },
+        template: `
+            <div ng-if="$ctrl.data.length > 0">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th>Inventory Status (Custom Filter)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="p in $ctrl.data">
+                            <td style="color:#94a3b8; font-family:monospace;">#{{ p.sku }}</td>
+                            <td><strong>{{ p.name | uppercase }}</strong></td>
+                            <td>{{ p.qty }}</td>
+                            <td>
+                                <span class="status-tag" ng-class="p.qty < 5 ? 'low' : 'ok'">
+                                    {{ p.qty | stockStatus }}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div ng-if="$ctrl.data.length == 0" style="text-align:center; padding:50px; color:#64748b;">
+                Warehouse is empty. Register items to track stock.
+            </div>`
+    });
+
+    // Main Controller
+    app.controller('StockCtrl', function() {
+        var vm = this;
+        vm.products = [];
+        vm.newItem = {};
+
+        vm.addItem = function() {
+            if(vm.newItem.sku && vm.newItem.name) {
+                vm.products.push(angular.copy(vm.newItem));
+                vm.newItem = {};
+            } else {
+                alert("Please enter SKU and Product Name");
+            }
+        };
+    });
+</script>
+
+</body>
+</html>

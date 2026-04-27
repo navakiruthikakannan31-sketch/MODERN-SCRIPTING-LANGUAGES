@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html ng-app="libraryApp">
+<head>
+    <title>Mepco Library - 5 Filter System</title>
+    <script src="angular.min.js"></script>
+    <style>
+        :root { --primary: #1a73e8; --bg: #f8fafc; }
+        body { background: var(--bg); font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .filter-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-top: 15px; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; outline: none; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f1f5f9; color: #475569; font-size: 12px; text-transform: uppercase; }
+        .badge { background: #e0e7ff; color: #4338ca; padding: 4px 8px; border-radius: 4px; font-family: monospace; }
+        [ng-cloak] { display: none !important; }
+    </style>
+</head>
+<body ng-controller="LibCtrl" ng-cloak>
+
+    <div class="container">
+        <!-- 1. ENTRY FORM -->
+        <div class="card">
+            <h2 style="color: var(--primary); margin-top: 0;">BOOK ENTRY</h2>
+            <div class="filter-grid">
+                <input type="text" ng-model="book.isbn" placeholder="ISBN (e.g. 987654)">
+                <input type="text" ng-model="book.title" placeholder="Book Title">
+                <input type="text" ng-model="book.author" placeholder="Author">
+            </div>
+            <div class="filter-grid">
+                <input type="number" ng-model="book.price" placeholder="Price">
+                <input type="date" ng-model="book.entryDate">
+                <button ng-click="save()" style="background:var(--primary); color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">ADD BOOK</button>
+            </div>
+        </div>
+
+        <!-- 2. LIVE FILTERS SECTION -->
+        <div class="card" style="border-top: 4px solid var(--primary);">
+            <h3 style="margin-top: 0;">LIVE FILTERS</h3>
+            <div class="filter-grid">
+                <!-- Filter 1: Global Text Search -->
+                <input type="text" ng-model="searchTxt" placeholder="🔍 Search Title or Author...">
+                
+                <!-- Filter 2: Custom Price Range -->
+                <input type="number" ng-model="maxPrice" placeholder="Max Price Limit (₹)">
+                
+                <!-- Filter 3: OrderBy Sorting -->
+                <select ng-model="sortBy">
+                    <option value="">-- Sort By --</option>
+                    <option value="title">Title (A-Z)</option>
+                    <option value="price">Price (Low to High)</option>
+                    <option value="-entryDate">Date (Newest First)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 3. DISPLAY TABLE -->
+        <table ng-show="list.length > 0">
+            <thead>
+                <tr>
+                    <th>ISBN (Masked)</th>
+                    <th>Book Details</th>
+                    <th>Price (Currency)</th>
+                    <th>Added Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Chaining multiple filters: Search -> Price Range -> Sort -->
+                <tr ng-repeat="item in list | filter:searchTxt | priceLimit:maxPrice | orderBy:sortBy">
+                    <td><span class="badge" ng-bind="item.isbn | maskIsbn"></span></td> <!-- Filter 5: Custom Masking -->
+                    <td>
+                        <strong ng-bind="item.title | uppercase"></strong><br> <!-- Built-in Uppercase -->
+                        <small style="color:gray">by <span ng-bind="item.author"></span></small>
+                    </td>
+                    <td style="color:#059669; font-weight:bold;" ng-bind="item.price | currency:'₹'"></td> <!-- Filter 4: Currency -->
+                    <td ng-bind="item.entryDate | date:'mediumDate'"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div ng-show="list.length == 0" style="text-align:center; padding:40px; color:#94a3b8;">
+            No books found. Use the form above to add your first book!
+        </div>
+    </div>
+
+    <script>
+        var app = angular.module('libraryApp', []);
+
+        // FILTER 5: Custom ISBN Masking (Shows only last 3 digits)
+        app.filter('maskIsbn', function() {
+            return function(input) {
+                if (!input) return "";
+                var str = input.toString();
+                return str.length > 3 ? "ISBN-***" + str.slice(-3) : str;
+            };
+        });
+
+        // FILTER 2: Custom Price Range Logic
+        app.filter('priceLimit', function() {
+            return function(items, maxPrice) {
+                if (!maxPrice) return items; // Show all if no limit is set
+                return items.filter(function(item) {
+                    return item.price <= maxPrice;
+                });
+            };
+        });
+
+        app.controller('LibCtrl', function($scope) {
+            $scope.list = [];
+            $scope.book = {};
+            $scope.sortBy = 'title'; // Default sorting
+
+            $scope.save = function() {
+                if($scope.book.title && $scope.book.isbn) {
+                    $scope.list.push(angular.copy($scope.book));
+                    $scope.book = {}; // Clear form after adding
+                } else {
+                    alert("Please enter at least ISBN and Title!");
+                }
+            };
+        });
+    </script>
+</body>
+</html>
